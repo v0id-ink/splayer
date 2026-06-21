@@ -31,6 +31,10 @@ server.interceptors.request.use(
     // pinia
     const settingStore = useSettingStore();
     if (!request.params) request.params = {};
+    // Web 版标识来源
+    if (!isElectron) {
+      request.params.form = "splayer";
+    }
     // Cookie
     if (!request.params.noCookie && (isLogin() || getCookie("MUSIC_U") !== null)) {
       const cookie = `MUSIC_U=${getCookie("MUSIC_U")};os=pc;`;
