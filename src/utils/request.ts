@@ -1,18 +1,20 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
-import { isDev } from "./env";
+import { isDev, isElectron } from "./env";
 import { useSettingStore } from "@/stores";
 import { getCookie } from "./cookie";
 import { isLogin } from "./auth";
 import axiosRetry from "axios-retry";
 
-// 全局地址
-const baseURL: string = String(isDev ? "/api/netease" : import.meta.env["VITE_API_URL"]);
+// 全局地址：Electron 走嵌入服务器，Web 直接走远程后端（必须配置 VITE_API_URL）
+const baseURL: string = isElectron
+  ? String(isDev ? "/api/netease" : import.meta.env["VITE_API_URL"])
+  : String(import.meta.env["VITE_API_URL"] ?? "");
 
 // 基础配置
 const server: AxiosInstance = axios.create({
   baseURL,
-  // 允许跨域
-  withCredentials: true,
+  // Electron 同源可带 Cookie；Web 跨域不带，凭据走 query
+  withCredentials: isElectron,
   // 超时时间
   timeout: 15000,
 });
