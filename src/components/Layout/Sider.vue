@@ -4,7 +4,7 @@
     <!-- Logo -->
     <div :class="['logo', { collapsed: statusStore.menuCollapsed }]" @click="router.push('/')">
       <Logo />
-      <n-text>SPlayer</n-text>
+      <n-text>SPlayer<span class="plus">+</span></n-text>
     </div>
     <n-scrollbar
       :style="{
@@ -63,5 +63,8 @@ const statusStore = useStatusStore();
       transform: scale(1);
     }
   }
+}
+.plus {
+  color: #2080f0;
 }
 </style>

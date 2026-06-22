@@ -63,7 +63,7 @@
             <template #header>
               <n-flex align="center" justify="center" class="aside-logo">
                 <Logo />
-                <n-text>SPlayer</n-text>
+                <n-text>SPlayer<span class="plus">+</span></n-text>
               </n-flex>
             </template>
             <Menu @menu-click="showAside = false" />
@@ -373,6 +373,9 @@ onMounted(async () => {
     margin-top: 2px;
     line-height: 40px;
   }
+}
+.plus {
+  color: #2080f0;
 }
 .checkbox {
   display: flex;
