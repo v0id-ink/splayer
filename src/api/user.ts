@@ -140,6 +140,19 @@ export const scrobble = (
   });
 };
 
+// 听歌打卡 V1 (旧版)
+export const scrobbleOld = (id: number, sourceid: number, time?: number) => {
+  return request({
+    url: "/scrobble",
+    params: {
+      id,
+      sourceid,
+      time,
+      timestamp: Date.now(),
+    },
+  });
+};
+
 // 每日签到
 export const dailySignin = (type: 0 | 1 = 0) => {
   return request({

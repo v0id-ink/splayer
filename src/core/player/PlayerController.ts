@@ -8,7 +8,7 @@ import { calculateLyricIndex } from "@/utils/calc";
 import { getCoverColor } from "@/utils/color";
 import { isElectron, isMac } from "@/utils/env";
 import { isLogin } from "@/utils/auth";
-import { scrobble } from "@/api/user";
+import { scrobble, scrobbleOld } from "@/api/user";
 import { getPlayerInfoObj, getPlaySongData } from "@/utils/format";
 import { handleSongQuality, shuffleArray, sleep } from "@/utils/helper";
 import lastfmScrobbler from "@/utils/lastfmScrobbler";
@@ -1479,15 +1479,23 @@ class PlayerController {
     // 听歌时长超过歌曲总时长时截断
     const time = total > 0 ? Math.min(playedSeconds, total) : playedSeconds;
     const info = getPlayerInfoObj(song);
-    scrobble(song.id, time, {
-      sourceid: sourceId,
-      name: info?.name,
-      artist: info?.artist,
-      level: settingStore.songLevel,
-      total,
-    }).catch((err) => {
-      console.warn("听歌打卡失败", err);
-    });
+    // 根据接口版本分流调用
+    if (settingStore.scrobbleVersion === "old") {
+      // 旧版接口仅需 id、sourceid、time
+      scrobbleOld(song.id, sourceId, time).catch((err) => {
+        console.warn("听歌打卡失败", err);
+      });
+    } else {
+      scrobble(song.id, time, {
+        sourceid: sourceId,
+        name: info?.name,
+        artist: info?.artist,
+        level: settingStore.songLevel,
+        total,
+      }).catch((err) => {
+        console.warn("听歌打卡失败", err);
+      });
+    }
   }
 
   /**

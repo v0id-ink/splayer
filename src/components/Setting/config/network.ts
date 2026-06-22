@@ -558,6 +558,22 @@ export const useNetworkSettings = (): SettingConfig => {
               get: () => settingStore.scrobbleSong,
               set: (v) => (settingStore.scrobbleSong = v),
             }),
+            children: [
+              {
+                key: "scrobbleVersion",
+                label: "网易云音乐听歌打卡接口版本",
+                type: "select",
+                description: "新版使用 NCBL 加密格式，旧版为普通请求",
+                options: [
+                  { label: "新版", value: "new" },
+                  { label: "旧版", value: "old" },
+                ],
+                value: computed({
+                  get: () => settingStore.scrobbleVersion,
+                  set: (v) => (settingStore.scrobbleVersion = v),
+                }),
+              },
+            ],
           },
         ],
       },

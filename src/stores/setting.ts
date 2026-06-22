@@ -548,6 +548,7 @@ export const useSettingStore = defineStore("setting", {
     smtcOpen: true,
     playSongDemo: false,
     scrobbleSong: false,
+    scrobbleVersion: "new",
     dynamicCover: false,
     lyricFontSizeMode: "adaptive",
     lyricFontSize: 46,
