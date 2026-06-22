@@ -61,6 +61,10 @@ class PlayerController {
   private rateResetTimer: ReturnType<typeof setTimeout> | undefined;
   /** 速率渐变动画帧 */
   private rateRampFrame: number | undefined;
+  /** 当前歌曲实际播放毫秒数（用于听歌打卡） */
+  private scrobblePlayedMs = 0;
+  /** 上次 timeupdate 时间戳，用于计算实际播放增量 */
+  private scrobbleLastTickMs = 0;
 
   constructor() {
     // 初始化 AudioManager（会根据设置自动选择引擎）
@@ -197,6 +201,9 @@ class PlayerController {
 
     musicStore.playSong = song;
     statusStore.currentTime = startSeek;
+    // 重置听歌打卡累计
+    this.scrobblePlayedMs = 0;
+    this.scrobbleLastTickMs = 0;
     // 重置进度
     statusStore.progress = 0;
     statusStore.lyricIndex = -1;
@@ -263,6 +270,8 @@ class PlayerController {
   ) {
     const statusStore = useStatusStore();
     const audioManager = useAudioManager();
+    // 上报上一首实际播放时长（切歌时触发）
+    this.scrobbleCurrentSong();
     // 重置过渡状态
     this.isTransitioning = false;
     useAutomixManager().resetNextAnalysisCache();
@@ -702,6 +711,8 @@ class PlayerController {
       // 只有真正播放了才重置重试计数
       if (this.retryInfo.count > 0) this.retryInfo.count = 0;
       // 注意：failSkipCount 的重置移至 onTimeUpdate，确保有实际进度
+      // 初始化听歌打卡累计时间戳
+      this.scrobbleLastTickMs = Date.now();
       // Last.fm Scrobbler
       lastfmScrobbler.resume();
       // IPC 通知
@@ -722,6 +733,8 @@ class PlayerController {
       playerIpc.sendTaskbarState({ isPlaying: false });
       playerIpc.sendTaskbarMode("paused");
       playerIpc.sendTaskbarProgress(statusStore.progress);
+      // 暂停时停止累计听歌打卡时长
+      this.scrobbleLastTickMs = 0;
       lastfmScrobbler.pause();
       console.log(`⏸️ [${musicStore.playSong?.id}] 歌曲暂停`);
     });
@@ -735,8 +748,7 @@ class PlayerController {
       useAutomixManager().resetAutomixScheduling("IDLE");
       console.log(`⏹️ [${musicStore.playSong?.id}] 歌曲结束`);
       lastfmScrobbler.stop();
-      // 听歌打卡
-      this.scrobbleCurrentSong();
+      // 听歌打卡由后续 nextOrPrev -> playSong 统一上报，避免重复
       // 检查定时关闭
       if (this.checkAutoClose()) return;
       // 自动播放下一首
@@ -754,6 +766,16 @@ class PlayerController {
       const rawTime = audioManager.currentTime;
       const currentTime = Math.floor(rawTime * 1000);
       const duration = Math.floor(audioManager.duration * 1000) || statusStore.duration;
+      // 累计实际播放时长（用于听歌打卡）
+      if (this.scrobbleLastTickMs > 0) {
+        const now = Date.now();
+        const delta = now - this.scrobbleLastTickMs;
+        // 限制单次增量上限，避免后台切换造成异常累积
+        if (delta > 0 && delta < 5000) {
+          this.scrobblePlayedMs += delta;
+        }
+        this.scrobbleLastTickMs = now;
+      }
       useAutomixManager().updateAutomixMonitoring();
       // 计算歌词索引
       const songId = musicStore.playSong?.id;
@@ -1444,21 +1466,25 @@ class PlayerController {
     const musicStore = useMusicStore();
     const audioManager = useAudioManager();
     const song = musicStore.playSong;
-    // 仅在线歌曲打卡
+    // 仅上报音乐类型（排除电台、流媒体、本地歌曲）
     if (!song?.id || song.type !== "song" || song.path) return;
+    // 实际播放时长（秒），不足 10 秒不上报
+    const playedSeconds = Math.floor(this.scrobblePlayedMs / 1000);
+    if (playedSeconds < 10) return;
     // sourceid 优先取歌单 id，其次专辑 id
     const sourceId =
-      musicStore.playPlaylistId ||
-      (typeof song.album === "object" ? song.album.id : 0);
+      musicStore.playPlaylistId || (typeof song.album === "object" ? song.album.id : 0);
     if (!sourceId) return;
-    const duration = Math.floor(audioManager.duration || 0);
+    // 歌曲总时长（秒），若实际播放时长超过总时长则以上报时长为准
+    const durationSeconds = Math.floor(audioManager.duration || 0);
+    const total = Math.max(durationSeconds, playedSeconds);
     const info = getPlayerInfoObj(song);
-    scrobble(song.id, duration, {
+    scrobble(song.id, playedSeconds, {
       sourceid: sourceId,
       name: info?.name,
       artist: info?.artist,
       level: settingStore.songLevel,
-      total: duration,
+      total,
     }).catch((err) => {
       console.warn("听歌打卡失败", err);
     });
