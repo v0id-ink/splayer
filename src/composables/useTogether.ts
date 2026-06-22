@@ -32,23 +32,22 @@ let listDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 export async function createRoom() {
   const togetherStore = useTogetherStore();
   const dataStore = useDataStore();
-  const message = useMessage();
   try {
     const res: any = await apiCreateRoom();
     if (res.code !== 200) {
-      message.error("创建房间失败: " + (res.message || "未知错误"));
+      window.$message?.error("创建房间失败: " + (res.message || "未知错误"));
       return false;
     }
     const roomId = res.data.roomInfo.roomId;
     togetherStore.setRoom(roomId, dataStore.userData.userId, true);
     await apiCheckRoom(roomId);
-    message.success("房间已创建");
+    window.$message?.success("房间已创建");
     startPolling();
     await syncPlaylistToRemote();
     return true;
   } catch (err) {
     console.error(err);
-    message.error("创建房间出错");
+    window.$message?.error("创建房间出错");
     return false;
   }
 }
@@ -56,22 +55,21 @@ export async function createRoom() {
 /** 加入房间（客人） */
 export async function joinRoom(roomId: string, inviterId: number) {
   const togetherStore = useTogetherStore();
-  const message = useMessage();
   try {
     const res: any = await apiAcceptJoin(roomId, inviterId);
     if (res.code !== 200) {
-      message.error("加入房间失败: " + (res.message || "未知错误"));
+      window.$message?.error("加入房间失败: " + (res.message || "未知错误"));
       return false;
     }
     togetherStore.setRoom(roomId, inviterId, false);
     await apiCheckRoom(roomId);
-    message.success("已加入房间");
+    window.$message?.success("已加入房间");
     startPolling();
     await fetchRemotePlaylist();
     return true;
   } catch (err) {
     console.error(err);
-    message.error("加入房间出错");
+    window.$message?.error("加入房间出错");
     return false;
   }
 }
@@ -79,15 +77,14 @@ export async function joinRoom(roomId: string, inviterId: number) {
 /** 退出/关闭房间 */
 export async function leaveRoom() {
   const togetherStore = useTogetherStore();
-  const message = useMessage();
   if (!togetherStore.roomId) return;
   stopPolling();
   try {
     const res: any = await apiEndRoom(togetherStore.roomId);
     if (res.code !== 200 || !res.data?.success) {
-      message.warning("房间关闭失败");
+      window.$message?.warning("房间关闭失败");
     } else {
-      message.success(togetherStore.isHost ? "房间已关闭" : "已退出房间");
+      window.$message?.success(togetherStore.isHost ? "房间已关闭" : "已退出房间");
     }
   } catch (err) {
     console.error(err);
