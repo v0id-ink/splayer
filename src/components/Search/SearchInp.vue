@@ -20,18 +20,23 @@
       </template>
     </n-input>
     <!-- 听歌识曲 -->
-    <n-button
-      :focusable="false"
-      title="听歌识曲"
-      class="audio-match-btn"
-      tertiary
-      circle
-      @click="openAudioMatch"
+    <n-popover
+      v-model:show="audioMatchShow"
+      trigger="click"
+      placement="bottom-end"
+      :width="420"
+      :show-arrow="false"
+      :close-on-outside-click="true"
     >
-      <template #icon>
-        <SvgIcon :size="18" name="Record" />
+      <template #trigger>
+        <n-button :focusable="false" title="听歌识曲" class="audio-match-btn" tertiary circle>
+          <template #icon>
+            <SvgIcon :size="18" name="Record" />
+          </template>
+        </n-button>
       </template>
-    </n-button>
+      <AudioMatch @close="audioMatchShow = false" />
+    </n-popover>
     <!-- 搜索框遮罩 -->
     <Transition name="fade" mode="out-in">
       <div v-show="statusStore.searchFocus" class="search-mask" @click.stop="closeSearchFocus" />
@@ -52,7 +57,7 @@ import { usePlayerController } from "@/core/player/PlayerController";
 import { songDetail } from "@/api/song";
 import { formatSongsList } from "@/utils/format";
 import SearchInpMenu from "@/components/Menu/SearchInpMenu.vue";
-import { openAudioMatch } from "@/utils/modal";
+import AudioMatch from "@/components/Modal/AudioMatch.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -60,6 +65,9 @@ const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const player = usePlayerController();
+
+// 听歌识曲弹窗
+const audioMatchShow = ref(false);
 
 // 右键菜单
 const searchInpMenuRef = ref<InstanceType<typeof SearchInpMenu> | null>(null);

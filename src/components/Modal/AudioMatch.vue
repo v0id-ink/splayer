@@ -81,6 +81,10 @@ let scriptsLoaded = false;
 
 const player = usePlayerController();
 
+const emit = defineEmits<{
+  close: [];
+}>();
+
 /** 格式化歌手名 */
 function formatArtist(artists: any): string {
   if (!artists) return "未知艺术家";
@@ -214,7 +218,7 @@ async function onRecordingFinished(recording: Float32Array) {
 /** 播放歌曲 */
 function playSong(song: SongType) {
   player.addNextSong(song, true);
-  window.$modal?.destroyAll();
+  emit("close");
 }
 
 /** 重置 */
