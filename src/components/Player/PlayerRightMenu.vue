@@ -96,7 +96,7 @@
     </n-badge>
     <!-- 一起听 -->
     <n-badge
-      v-if="!statusStore.personalFmMode"
+      v-if="!statusStore.personalFmMode && enableListenTogether"
       :value="togetherStore.onlineCount"
       :show="togetherStore.inRoom"
       :max="99"
@@ -123,7 +123,7 @@ import {
   useMusicStore,
   useTogetherStore,
 } from "@/stores";
-import { isElectron } from "@/utils/env";
+import { isElectron, enableListenTogether } from "@/utils/env";
 import { renderIcon } from "@/utils/helper";
 import { openAutoClose, openChangeRate, openEqualizer, openABLoop } from "@/utils/modal";
 import { useAudioManager } from "@/core/player/AudioManager";
