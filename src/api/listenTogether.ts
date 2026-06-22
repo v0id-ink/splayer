@@ -67,7 +67,7 @@ export const heartbeat = (
   progress: number,
 ) => {
   return request({
-    url: "/listentogether/heartbeat",
+    url: "/listentogether/heatbeat",
     method: "post",
     params: { roomId, songId, playStatus, progress, timestamp: Date.now() },
   });
