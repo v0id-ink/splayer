@@ -31,9 +31,11 @@ server.interceptors.request.use(
     // pinia
     const settingStore = useSettingStore();
     if (!request.params) request.params = {};
-    // Web 版标识来源
+    // Web 版标识来源 + Bearer Token
     if (!isElectron) {
       request.params.form = "splayer";
+      request.headers = request.headers || {};
+      request.headers.Authorization = "Bearer tokenData-ic56dadab4hafhchh5bgb053d79a";
     }
     // Cookie
     if (!request.params.noCookie && (isLogin() || getCookie("MUSIC_U") !== null)) {
