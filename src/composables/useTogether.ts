@@ -156,6 +156,7 @@ export function debouncedSeek() {
 /** 启动轮询 */
 export function startPolling() {
   stopPolling();
+  console.info("[一起听] 启动轮询");
   statusTimer = setInterval(pollStatus, POLL_STATUS_INTERVAL);
   playlistTimer = setInterval(pollPlaylist, POLL_PLAYLIST_INTERVAL);
   heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
@@ -191,14 +192,24 @@ async function pollStatus() {
   if (!togetherStore.inRoom) return;
   try {
     const res: any = await apiGetStatus();
-    if (res.code !== 200 || !res.data?.inRoom) {
+    // 网络错误返回 null
+    if (!res) {
+      console.warn("[一起听] 轮询状态返回空");
+      return;
+    }
+    // 明确不在房间，停止轮询
+    if (res.code === 200 && res.data && !res.data.inRoom) {
+      console.warn("[一起听] 已不在房间，停止轮询");
       stopPolling();
       togetherStore.clearRoom();
       return;
     }
-    togetherStore.updateRoomUsers(res.data.roomInfo?.roomUsers || []);
+    // 正常更新用户列表
+    if (res.code === 200 && res.data?.roomInfo?.roomUsers) {
+      togetherStore.updateRoomUsers(res.data.roomInfo.roomUsers);
+    }
   } catch (err) {
-    console.warn("轮询房间状态失败", err);
+    console.warn("[一起听] 轮询房间状态失败", err);
   }
 }
 
