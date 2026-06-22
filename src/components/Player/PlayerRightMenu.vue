@@ -94,12 +94,35 @@
         <SvgIcon name="PlayList" />
       </div>
     </n-badge>
+    <!-- 一起听 -->
+    <n-badge
+      v-if="!statusStore.personalFmMode"
+      :value="togetherStore.onlineCount"
+      :show="togetherStore.inRoom"
+      :max="99"
+      type="info"
+      :style="{ marginRight: togetherStore.inRoom ? '12px' : null }"
+    >
+      <div
+        class="menu-icon"
+        :class="{ active: togetherStore.drawerShow }"
+        @click.stop="togetherStore.toggleDrawer()"
+      >
+        <SvgIcon name="Person" />
+      </div>
+    </n-badge>
   </n-flex>
 </template>
 
 <script setup lang="ts">
 import { usePlayerController } from "@/core/player/PlayerController";
-import { useDataStore, useSettingStore, useStatusStore, useMusicStore } from "@/stores";
+import {
+  useDataStore,
+  useSettingStore,
+  useStatusStore,
+  useMusicStore,
+  useTogetherStore,
+} from "@/stores";
 import { isElectron } from "@/utils/env";
 import { renderIcon } from "@/utils/helper";
 import { openAutoClose, openChangeRate, openEqualizer, openABLoop } from "@/utils/modal";
@@ -111,6 +134,7 @@ const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const musicStore = useMusicStore();
+const togetherStore = useTogetherStore();
 const player = usePlayerController();
 
 const {

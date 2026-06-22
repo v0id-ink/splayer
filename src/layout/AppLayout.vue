@@ -112,6 +112,8 @@
     </n-layout>
     <!-- 播放列表 -->
     <SongPlayList />
+    <!-- 一起听 -->
+    <TogetherDrawer />
     <!-- 全局播放器 -->
     <MainPlayer />
     <!-- 全屏播放器 -->
