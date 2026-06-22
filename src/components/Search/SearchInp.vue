@@ -23,7 +23,7 @@
     <n-popover
       v-model:show="audioMatchShow"
       trigger="click"
-      placement="bottom-end"
+      placement="bottom"
       :width="420"
       :show-arrow="false"
       :close-on-outside-click="true"

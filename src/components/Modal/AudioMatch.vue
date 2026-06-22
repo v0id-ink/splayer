@@ -60,8 +60,8 @@ import { usePlayerController } from "@/core/player/PlayerController";
 import { formatSongsList, removeBrackets } from "@/utils/format";
 import type { SongType } from "@/types";
 
-/** 录制时长（秒） */
-const RECORD_DURATION = 3;
+/** 最大录制时长（秒） */
+const MAX_DURATION = 15;
 /** 采样率 */
 const SAMPLE_RATE = 8000;
 
@@ -69,6 +69,8 @@ type Status = "idle" | "recording" | "matching" | "result";
 
 const status = ref<Status>("idle");
 const songs = ref<SongType[]>([]);
+// 录制计时显示
+const recordElapsed = ref(0);
 
 const canvasRef = ref<HTMLCanvasElement>();
 let audioCtx: AudioContext | null = null;
@@ -78,6 +80,8 @@ let canvasAnimId: number | null = null;
 let audioBuffer: Float32Array | null = null;
 let bufferHealth = 0;
 let scriptsLoaded = false;
+// 录制起始时间戳
+let recordStartTime = 0;
 
 const player = usePlayerController();
 
@@ -100,7 +104,7 @@ const statusText = computed(() => {
     case "idle":
       return "点击按钮开始录音";
     case "recording":
-      return `${(RECORD_DURATION * (1 - bufferHealth)).toFixed(1)}s / ${RECORD_DURATION}s`;
+      return `录制中 ${recordElapsed.value.toFixed(1)}s / ${MAX_DURATION}s`;
     case "matching":
       return "正在识别...";
     default:
@@ -165,7 +169,7 @@ async function initAudio() {
 /** 切换录制状态 */
 async function toggleRecord() {
   if (status.value === "recording") {
-    // 停止录制
+    // 手动停止录制
     recorderNode?.port.postMessage({ message: "stop" });
   } else if (status.value === "idle") {
     try {
@@ -177,8 +181,12 @@ async function toggleRecord() {
       status.value = "recording";
       bufferHealth = 0;
       audioBuffer = null;
-      recorderNode?.port.postMessage({ message: "start", duration: RECORD_DURATION });
+      recordStartTime = Date.now();
+      recordElapsed.value = 0;
+      recorderNode?.port.postMessage({ message: "start", duration: MAX_DURATION });
       startCanvasAnim();
+      // 启动计时显示
+      startStatusTimer();
     } catch (err) {
       console.error(err);
       window.$message?.error("无法访问麦克风，请检查权限");
@@ -186,17 +194,35 @@ async function toggleRecord() {
   }
 }
 
+// 状态文本计时器
+let statusTimer: ReturnType<typeof setInterval> | null = null;
+function startStatusTimer() {
+  if (statusTimer) clearInterval(statusTimer);
+  statusTimer = setInterval(() => {
+    recordElapsed.value = Math.min(MAX_DURATION, (Date.now() - recordStartTime) / 1000);
+  }, 100);
+}
+function stopStatusTimer() {
+  if (statusTimer) {
+    clearInterval(statusTimer);
+    statusTimer = null;
+  }
+}
+
 /** 录制完成 */
 async function onRecordingFinished(recording: Float32Array) {
   status.value = "matching";
   stopCanvasAnim();
+  stopStatusTimer();
+  // 实际录制时长（秒）
+  const duration = Math.min(MAX_DURATION, (Date.now() - recordStartTime) / 1000);
   try {
     // 生成指纹
     const generateFP = (window as any).GenerateFP as (arr: Float32Array) => Promise<string>;
     if (!generateFP) throw new Error("指纹生成器未加载");
     const fp = await generateFP(recording);
     // 调用识别 API
-    const res: any = await audioMatch(RECORD_DURATION, fp);
+    const res: any = await audioMatch(duration, fp);
     const result = res?.data?.result;
     if (!result || !Array.isArray(result) || !result.length) {
       songs.value = [];
@@ -267,6 +293,7 @@ function stopCanvasAnim() {
 
 onBeforeUnmount(() => {
   stopCanvasAnim();
+  stopStatusTimer();
   if (micStream) {
     micStream.getTracks().forEach((t) => t.stop());
     micStream = null;
@@ -372,10 +399,10 @@ onBeforeUnmount(() => {
   }
 
   .play-btn {
-      opacity: 0;
-      transition: opacity 0.2s;
-      color: var(--primary-hex);
-    }
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: var(--primary-hex);
+  }
 }
 
 .retry-btn {
