@@ -48,8 +48,6 @@ export interface SettingState {
   taskbarLyricUseThemeColor: boolean;
   /** 是否使用在线服务 */
   useOnlineService: boolean;
-  /** 分享链接格式 */
-  shareUrlFormat: "web" | "mobile";
   /** 启动时检查更新 */
   checkUpdateOnStart: boolean;
   /** 隐藏 VIP 标签 */
@@ -507,7 +505,6 @@ export const useSettingStore = defineStore("setting", {
     routeAnimation: "slide",
     playerExpandAnimation: "up",
     useOnlineService: true,
-    shareUrlFormat: "web",
     showCloseAppTip: true,
     closeAppMethod: "hide",
     showTaskbarProgress: false,

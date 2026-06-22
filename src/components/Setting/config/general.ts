@@ -342,23 +342,7 @@ export const useGeneralSettings = (): SettingConfig => {
       },
       {
         title: "其他设置",
-        items: [
-          {
-            key: "shareUrlFormat",
-            label: "分享链接格式",
-            type: "select",
-            description: "自定义分享链接的生成格式",
-            show: computed(() => isElectron),
-            options: [
-              { label: "网页版", value: "web" },
-              { label: "移动版", value: "mobile" },
-            ],
-            value: computed({
-              get: () => settingStore.shareUrlFormat,
-              set: (v) => (settingStore.shareUrlFormat = v),
-            }),
-          },
-        ],
+        items: [],
       },
       {
         title: "备份与恢复",

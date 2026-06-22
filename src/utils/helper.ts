@@ -488,12 +488,6 @@ export const getShareUrl = (type: string, id: number | string): string => {
     return `${window.location.origin}${window.location.pathname}#/play-music?id=${id}&src=share`;
   }
 
-  const settingStore = useSettingStore();
-  const { shareUrlFormat } = settingStore;
-
-  if (shareUrlFormat === "mobile") {
-    return `https://y.music.163.com/m/${type}?id=${id}`;
-  }
-
+  // Electron 端使用网易云官方链接
   return `https://music.163.com/#/${type}?id=${id}`;
 };
