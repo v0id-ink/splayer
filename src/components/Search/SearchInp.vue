@@ -19,6 +19,19 @@
         <SvgIcon :size="18" name="Search" />
       </template>
     </n-input>
+    <!-- 听歌识曲 -->
+    <n-button
+      :focusable="false"
+      title="听歌识曲"
+      class="audio-match-btn"
+      tertiary
+      circle
+      @click="openAudioMatch"
+    >
+      <template #icon>
+        <SvgIcon :size="18" name="Record" />
+      </template>
+    </n-button>
     <!-- 搜索框遮罩 -->
     <Transition name="fade" mode="out-in">
       <div v-show="statusStore.searchFocus" class="search-mask" @click.stop="closeSearchFocus" />
@@ -39,6 +52,7 @@ import { usePlayerController } from "@/core/player/PlayerController";
 import { songDetail } from "@/api/song";
 import { formatSongsList } from "@/utils/format";
 import SearchInpMenu from "@/components/Menu/SearchInpMenu.vue";
+import { openAudioMatch } from "@/utils/modal";
 
 const router = useRouter();
 const route = useRoute();
@@ -221,6 +235,9 @@ onMounted(() => {
 .search {
   position: absolute;
   left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   -webkit-app-region: no-drag;
   transition:
     left 0.3s,
@@ -237,6 +254,10 @@ onMounted(() => {
       height: 100%;
       width: 100%;
     }
+  }
+  .audio-match-btn {
+    flex-shrink: 0;
+    z-index: 101;
   }
   &.focus {
     .search-input {

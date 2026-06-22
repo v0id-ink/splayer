@@ -429,6 +429,21 @@ export const openEqualizer = async () => {
   });
 };
 
+/** 打开听歌识曲弹窗 */
+export const openAudioMatch = async () => {
+  const { default: AudioMatch } = await import("@/components/Modal/AudioMatch.vue");
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "420px" },
+    title: "听歌识曲",
+    content: () => {
+      return h(AudioMatch);
+    },
+  });
+};
+
 /**
  * 打开简介弹窗
  * @param content 简介内容
