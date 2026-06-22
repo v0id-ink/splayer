@@ -1475,11 +1475,12 @@ class PlayerController {
     const sourceId =
       musicStore.playPlaylistId || (typeof song.album === "object" ? song.album.id : 0);
     if (!sourceId) return;
-    // 歌曲总时长（秒），若实际播放时长超过总时长则以上报时长为准
-    const durationSeconds = Math.floor(audioManager.duration || 0);
-    const total = Math.max(durationSeconds, playedSeconds);
+    // 歌曲总时长（秒）
+    const total = Math.floor(audioManager.duration || 0);
+    // 听歌时长超过歌曲总时长时截断
+    const time = total > 0 ? Math.min(playedSeconds, total) : playedSeconds;
     const info = getPlayerInfoObj(song);
-    scrobble(song.id, playedSeconds, {
+    scrobble(song.id, time, {
       sourceid: sourceId,
       name: info?.name,
       artist: info?.artist,
