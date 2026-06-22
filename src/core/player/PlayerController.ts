@@ -1438,6 +1438,9 @@ class PlayerController {
   /** 听歌打卡（已登录且为在线歌曲时调用） */
   private scrobbleCurrentSong() {
     if (!isLogin()) return;
+    const settingStore = useSettingStore();
+    // 听歌打卡上报开关（默认关闭）
+    if (!settingStore.scrobbleSong) return;
     const musicStore = useMusicStore();
     const audioManager = useAudioManager();
     const song = musicStore.playSong;
@@ -1448,8 +1451,15 @@ class PlayerController {
       musicStore.playPlaylistId ||
       (typeof song.album === "object" ? song.album.id : 0);
     if (!sourceId) return;
-    const time = Math.floor(audioManager.duration || 0);
-    scrobble(song.id, sourceId, time).catch((err) => {
+    const duration = Math.floor(audioManager.duration || 0);
+    const info = getPlayerInfoObj(song);
+    scrobble(song.id, duration, {
+      sourceid: sourceId,
+      name: info?.name,
+      artist: info?.artist,
+      level: settingStore.songLevel,
+      total: duration,
+    }).catch((err) => {
       console.warn("听歌打卡失败", err);
     });
   }

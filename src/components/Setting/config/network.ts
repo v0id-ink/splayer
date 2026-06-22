@@ -545,6 +545,22 @@ export const useNetworkSettings = (): SettingConfig => {
           },
         ],
       },
+      {
+        title: "上报",
+        items: [
+          {
+            key: "scrobbleSong",
+            label: "听歌打卡上报",
+            type: "switch",
+            description: "向网易云上报听歌记录，默认关闭",
+            title: "⚠️ 开启听歌打卡上报存在封号风险，请谨慎使用",
+            value: computed({
+              get: () => settingStore.scrobbleSong,
+              set: (v) => (settingStore.scrobbleSong = v),
+            }),
+          },
+        ],
+      },
     ],
   };
 };
