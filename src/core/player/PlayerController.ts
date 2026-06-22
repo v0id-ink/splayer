@@ -1464,7 +1464,6 @@ class PlayerController {
     // 听歌打卡上报开关（默认关闭）
     if (!settingStore.scrobbleSong) return;
     const musicStore = useMusicStore();
-    const audioManager = useAudioManager();
     const song = musicStore.playSong;
     // 仅上报音乐类型（排除电台、流媒体、本地歌曲）
     if (!song?.id || song.type !== "song" || song.path) return;
@@ -1475,8 +1474,8 @@ class PlayerController {
     const sourceId =
       musicStore.playPlaylistId || (typeof song.album === "object" ? song.album.id : 0);
     if (!sourceId) return;
-    // 歌曲总时长（秒）
-    const total = Math.floor(audioManager.duration || 0);
+    // 歌曲总时长（秒），优先使用歌曲元数据，避免切歌后 audioManager 已重置
+    const total = song.duration > 0 ? Math.floor(song.duration / 1000) : 0;
     // 听歌时长超过歌曲总时长时截断
     const time = total > 0 ? Math.min(playedSeconds, total) : playedSeconds;
     const info = getPlayerInfoObj(song);

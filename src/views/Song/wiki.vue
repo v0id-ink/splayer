@@ -307,7 +307,7 @@ import {
   songFirstListenInfo,
 } from "@/api/song";
 import { formatSongsList, removeBrackets } from "@/utils/format";
-import { useSettingStore } from "@/stores";
+import { useSettingStore, useStatusStore } from "@/stores";
 import dayjs from "dayjs";
 import { useSongMenu } from "@/composables/useSongMenu";
 import { formatTimestamp } from "@/utils/time";
@@ -315,6 +315,7 @@ import { formatTimestamp } from "@/utils/time";
 const route = useRoute();
 const player = usePlayerController();
 const settingStore = useSettingStore();
+const statusStore = useStatusStore();
 
 const { getMenuOptions } = useSongMenu();
 
@@ -424,8 +425,9 @@ const normalizeWikiData = (
 };
 
 // 获取歌曲信息
-const fetchData = async (id?: number) => {
+const fetchData = async (id?: number, autoPlay?: boolean) => {
   id = id ?? Number(route.query.id);
+  autoPlay = autoPlay ?? route.query.play !== undefined;
   if (!id || id === currentSongId.value) return;
   const token = ++currentRequestToken.value;
   loading.value = true;
@@ -469,6 +471,11 @@ const fetchData = async (id?: number) => {
   } finally {
     if (token === currentRequestToken.value) {
       loading.value = false;
+      // 带有 play 参数时自动播放并打开全屏播放器
+      if (autoPlay && currentSong.value) {
+        handlePlay();
+        statusStore.showFullPlayer = true;
+      }
     }
   }
 };
@@ -502,7 +509,7 @@ onActivated(() => fetchData());
 
 // 监听路由更新
 onBeforeRouteUpdate((to) => {
-  fetchData(Number(to.query.id));
+  fetchData(Number(to.query.id), to.query.play !== undefined);
 });
 </script>
 
