@@ -13,7 +13,8 @@
     "electron/preload/index.ts",
     "src/assets/data/*",
     "src/types/shared",
-    "scripts/*"
+    "scripts/*",
+    "api/**/*"
   ],
   "compilerOptions": {
     "composite": true,

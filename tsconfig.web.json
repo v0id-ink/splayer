@@ -10,6 +10,7 @@
     "electron/preload/index.d.ts",
     "dist/lastfm.ts"
   ],
+  "exclude": ["api"],
   "compilerOptions": {
     "composite": true,
     "esModuleInterop": true,
