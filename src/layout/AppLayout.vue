@@ -124,11 +124,17 @@
 </template>
 
 <script setup lang="ts">
-import { useMusicStore, useStatusStore, useSettingStore, useDataStore } from "@/stores";
+import {
+  useMusicStore,
+  useStatusStore,
+  useSettingStore,
+  useDataStore,
+} from "@/stores";
 import { useBlobURLManager } from "@/core/resource/BlobURLManager";
 import { isElectron } from "@/utils/env";
 import { useMobile } from "@/composables/useMobile";
 import { useInit } from "@/composables/useInit";
+import { useTogetherSync } from "@/composables/useTogether";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
@@ -167,6 +173,9 @@ watchEffect(() => {
 
 // 初始化
 useInit();
+
+// 一起听同步引擎
+useTogetherSync();
 
 onMounted(() => {
   loadBackgroundImage();

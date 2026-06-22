@@ -40,13 +40,9 @@ import TogetherRoomCard from "./TogetherRoomCard.vue";
 import TogetherUserList from "./TogetherUserList.vue";
 import TogetherPlaylist from "./TogetherPlaylist.vue";
 import { useTogetherStore, useStatusStore } from "@/stores";
-import { useTogetherSync } from "@/composables/useTogether";
 
 const togetherStore = useTogetherStore();
 const statusStore = useStatusStore();
-
-// 启动同步引擎（watch + 防抖 + 防循环）
-useTogetherSync();
 </script>
 
 <style lang="scss" scoped>
