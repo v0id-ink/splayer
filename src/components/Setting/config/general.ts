@@ -348,6 +348,7 @@ export const useGeneralSettings = (): SettingConfig => {
             label: "分享链接格式",
             type: "select",
             description: "自定义分享链接的生成格式",
+            show: computed(() => isElectron),
             options: [
               { label: "网页版", value: "web" },
               { label: "移动版", value: "mobile" },
