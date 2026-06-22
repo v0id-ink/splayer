@@ -9,6 +9,7 @@ import { openUserAgreement } from "@/utils/modal";
 import { useEventListener } from "@vueuse/core";
 import { debounce } from "lodash-es";
 import { onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 
 /** 最终聚焦主窗口的延迟时间（毫秒） */
 const FINAL_FOCUS_DELAY_MS = 500;
@@ -34,8 +35,10 @@ export const useInit = () => {
     settingStore.checkAndMigrate();
     // 打印版本信息
     printVersion();
-    // 用户协议
-    openUserAgreement();
+    // 用户协议（分享来源时跳过，不弹窗也不标记为已同意）
+    if (useRoute().query.src !== "share") {
+      openUserAgreement();
+    }
     // 加载数据
     await dataStore.loadData();
     // 初始化 MediaSession
