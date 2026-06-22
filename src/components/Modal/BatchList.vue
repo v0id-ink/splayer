@@ -41,7 +41,7 @@
       <n-flex class="menu">
         <!-- 批量下载 -->
         <n-button
-          v-if="statusStore.isDeveloperMode"
+          v-if="!isElectron || statusStore.isDeveloperMode"
           :disabled="!checkCount || isLocal"
           type="primary"
           strong
