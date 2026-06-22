@@ -485,7 +485,8 @@ export const handleSongQuality = (
 export const getShareUrl = (type: string, id: number | string): string => {
   // Web 端使用 SPlayer 分享链接
   if (!isElectron) {
-    return `${window.location.origin}${window.location.pathname}#/play-music?id=${id}&src=share`;
+    const routePath = type === "song" ? "play-music" : type === "djradio" ? "radio" : type;
+    return `${window.location.origin}${window.location.pathname}#/${routePath}?id=${id}&src=share`;
   }
 
   // Electron 端使用网易云官方链接
