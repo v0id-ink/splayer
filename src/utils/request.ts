@@ -3,6 +3,7 @@ import { isDev, isElectron } from "./env";
 import { useSettingStore } from "@/stores";
 import { getCookie } from "./cookie";
 import { isLogin } from "./auth";
+import { ensureJwt } from "./jwt";
 import axiosRetry from "axios-retry";
 
 // 全局地址：Electron 走嵌入服务器，Web 直接走远程后端（必须配置 VITE_API_URL）
@@ -27,15 +28,14 @@ axiosRetry(server, {
 
 // 请求拦截器
 server.interceptors.request.use(
-  (request) => {
+  async (request) => {
     // pinia
     const settingStore = useSettingStore();
     if (!request.params) request.params = {};
-    // Web 版标识来源 + Bearer Token
+    // Web 版：JWT 通过 query 传递
     if (!isElectron) {
       request.params.form = "splayer";
-      request.headers = request.headers || {};
-      request.headers.Authorization = "Bearer tokenData-ic56dadab4hafhchh5bgb053d79a";
+      request.params.fctoken = await ensureJwt();
     }
     // Cookie
     if (!request.params.noCookie && (isLogin() || getCookie("MUSIC_U") !== null)) {
