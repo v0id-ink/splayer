@@ -7,6 +7,8 @@ import { type AudioAnalysis } from "@/types/audio/automix";
 import { calculateLyricIndex } from "@/utils/calc";
 import { getCoverColor } from "@/utils/color";
 import { isElectron, isMac } from "@/utils/env";
+import { isLogin } from "@/utils/auth";
+import { scrobble } from "@/api/user";
 import { getPlayerInfoObj, getPlaySongData } from "@/utils/format";
 import { handleSongQuality, shuffleArray, sleep } from "@/utils/helper";
 import lastfmScrobbler from "@/utils/lastfmScrobbler";
@@ -733,6 +735,8 @@ class PlayerController {
       useAutomixManager().resetAutomixScheduling("IDLE");
       console.log(`⏹️ [${musicStore.playSong?.id}] 歌曲结束`);
       lastfmScrobbler.stop();
+      // 听歌打卡
+      this.scrobbleCurrentSong();
       // 检查定时关闭
       if (this.checkAutoClose()) return;
       // 自动播放下一首
@@ -1429,6 +1433,25 @@ class PlayerController {
       return true;
     }
     return false;
+  }
+
+  /** 听歌打卡（已登录且为在线歌曲时调用） */
+  private scrobbleCurrentSong() {
+    if (!isLogin()) return;
+    const musicStore = useMusicStore();
+    const audioManager = useAudioManager();
+    const song = musicStore.playSong;
+    // 仅在线歌曲打卡
+    if (!song?.id || song.type !== "song" || song.path) return;
+    // sourceid 优先取歌单 id，其次专辑 id
+    const sourceId =
+      musicStore.playPlaylistId ||
+      (typeof song.album === "object" ? song.album.id : 0);
+    if (!sourceId) return;
+    const time = Math.floor(audioManager.duration || 0);
+    scrobble(song.id, sourceId, time).catch((err) => {
+      console.warn("听歌打卡失败", err);
+    });
   }
 
   /**
