@@ -60,7 +60,6 @@ export default defineConfig(({ mode }) => {
     // 渲染进程
     renderer: {
       root: ".",
-      envPrefix: ["VITE_", "TURNSTILE_"],
       plugins: [
         vue(),
         // mode === "development" && VueDevTools(),

@@ -27,7 +27,7 @@ interface TurnstileOptions {
   "timeout-callback"?: () => void;
 }
 
-const SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY;
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 const CONTAINER_ID = "turnstile-invisible";
 // Turnstile token 有效期 5 分钟，提前 1 分钟刷新
 const TOKEN_TTL = 4 * 60 * 1000;
@@ -110,7 +110,7 @@ export const getTurnstileToken = async (): Promise<string> => {
 
   // 未配置 site key 时跳过
   if (!SITE_KEY) {
-    console.warn("TURNSTILE_SITE_KEY 未配置，跳过验证");
+    console.warn("VITE_TURNSTILE_SITE_KEY 未配置，跳过验证");
     return "";
   }
 
