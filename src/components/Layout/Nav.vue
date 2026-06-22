@@ -367,15 +367,16 @@ onMounted(async () => {
 }
 .aside-logo {
   .n-text {
-    width: 90px;
+    width: 110px;
     font-size: 22px;
     font-family: "logo";
+    font-weight: 600;
     margin-top: 2px;
     line-height: 40px;
   }
 }
 .plus {
-  color: #2080f0;
+  color: #69b1ff;
 }
 .checkbox {
   display: flex;

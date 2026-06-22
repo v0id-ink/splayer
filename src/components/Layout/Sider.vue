@@ -37,9 +37,10 @@ const statusStore = useStatusStore();
     transition: transform 0.3s;
     cursor: pointer;
     .n-text {
-      width: 90px;
+      width: 110px;
       font-size: 22px;
       font-family: "logo";
+      font-weight: 600;
       margin-left: 8px;
       margin-top: 2px;
       line-height: 40px;
@@ -65,6 +66,6 @@ const statusStore = useStatusStore();
   }
 }
 .plus {
-  color: #2080f0;
+  color: #69b1ff;
 }
 </style>
