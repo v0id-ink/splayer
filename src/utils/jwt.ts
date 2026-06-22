@@ -1,10 +1,33 @@
 import { getTurnstileToken } from "./turnstile";
 import { isElectron } from "./env";
 
+// localStorage key
+const LS_TOKEN = "splayer_jwt_token";
+const LS_EXPIRE = "splayer_jwt_expire_at";
+
 // JWT 缓存与刷新
 let jwtToken: string | null = null;
 let jwtExpireAt = 0; // 毫秒时间戳
 let refreshPromise: Promise<string> | null = null;
+
+// 从 localStorage 恢复（页面刷新后复用）
+const restoreFromStorage = (): void => {
+  if (isElectron) return;
+  const token = localStorage.getItem(LS_TOKEN);
+  const expire = localStorage.getItem(LS_EXPIRE);
+  if (token && expire) {
+    jwtToken = token;
+    jwtExpireAt = Number(expire);
+  }
+};
+restoreFromStorage();
+
+// 持久化
+const saveToStorage = (): void => {
+  if (isElectron || !jwtToken) return;
+  localStorage.setItem(LS_TOKEN, jwtToken);
+  localStorage.setItem(LS_EXPIRE, String(jwtExpireAt));
+};
 
 // 判断是否过期（提前 60 秒刷新）
 const isExpired = (): boolean => {
@@ -27,6 +50,7 @@ const fetchJwt = async (): Promise<string> => {
   const data = (await res.json()) as { token: string; exp: number };
   jwtToken = data.token;
   jwtExpireAt = data.exp * 1000;
+  saveToStorage();
   return data.token;
 };
 
