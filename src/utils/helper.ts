@@ -483,6 +483,11 @@ export const handleSongQuality = (
  * @returns 分享链接
  */
 export const getShareUrl = (type: string, id: number | string): string => {
+  // Web 端使用 SPlayer 分享链接
+  if (!isElectron) {
+    return `${window.location.origin}${window.location.pathname}#/play-music?id=${id}&src=share`;
+  }
+
   const settingStore = useSettingStore();
   const { shareUrlFormat } = settingStore;
 

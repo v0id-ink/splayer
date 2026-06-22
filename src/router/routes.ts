@@ -339,6 +339,12 @@ const appRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  // 分享播放
+  {
+    path: "/play-music",
+    name: "play-music",
+    component: () => import("@/views/PlayMusic.vue"),
+  },
   // 最近播放
   {
     path: "/history",
