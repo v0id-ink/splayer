@@ -31,20 +31,18 @@
     <!-- 在房间 -->
     <template v-else>
       <div class="room-info">
-        <div class="room-id">
+        <div class="info-title">
           <span class="label">房间号</span>
-          <n-text code>{{ togetherStore.roomId }}</n-text>
+          <n-tag :type="togetherStore.isHost ? 'success' : 'info'" size="small" round>
+            {{ togetherStore.isHost ? "房主" : "客人" }}
+          </n-tag>
         </div>
-        <n-tag :type="togetherStore.isHost ? 'success' : 'info'" size="small" round>
-          {{ togetherStore.isHost ? "房主" : "客人" }}
-        </n-tag>
+        <n-text code class="room-id-text">{{ togetherStore.roomId }}</n-text>
       </div>
 
       <!-- 分享链接 -->
       <div class="share-link">
-        <n-text depth="3" style="font-size: 12px; margin-bottom: 4px; display: block">
-          分享链接
-        </n-text>
+        <n-text depth="3" class="label">分享链接</n-text>
         <n-input :value="shareLink" readonly size="small" @click="copyShareLink">
           <template #suffix>
             <n-button text type="primary" @click.stop="copyShareLink">复制</n-button>
@@ -53,7 +51,7 @@
       </div>
 
       <!-- 操作按钮 -->
-      <n-space style="margin-top: 12px">
+      <div class="actions">
         <n-button
           size="small"
           :type="togetherStore.isHost ? 'error' : 'warning'"
@@ -62,7 +60,7 @@
         >
           {{ togetherStore.isHost ? "关闭房间" : "退出房间" }}
         </n-button>
-      </n-space>
+      </div>
     </template>
   </div>
 </template>
@@ -131,25 +129,38 @@ async function copyShareLink() {
 }
 
 .room-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 
-  .room-id {
+  .info-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 8px;
 
     .label {
       font-size: 13px;
       opacity: 0.6;
     }
   }
+
+  .room-id-text {
+    display: block;
+    font-size: 13px;
+    word-break: break-all;
+  }
 }
 
 .share-link {
+  margin-bottom: 16px;
+
+  .label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+}
+
+.actions {
   margin-top: 4px;
 }
 </style>

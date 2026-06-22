@@ -21,15 +21,11 @@
         <!-- 房间状态卡片 -->
         <TogetherRoomCard />
 
-        <n-divider v-if="togetherStore.inRoom" style="margin: 16px 0" />
-
         <!-- 在线用户 -->
-        <TogetherUserList v-if="togetherStore.inRoom" />
-
-        <n-divider v-if="togetherStore.inRoom" style="margin: 16px 0" />
-
-        <!-- 房间歌单 -->
-        <TogetherPlaylist v-if="togetherStore.inRoom" />
+        <template v-if="togetherStore.inRoom">
+          <n-divider style="margin: 16px 0" />
+          <TogetherUserList />
+        </template>
       </div>
     </n-drawer-content>
   </n-drawer>
@@ -38,7 +34,6 @@
 <script setup lang="ts">
 import TogetherRoomCard from "./TogetherRoomCard.vue";
 import TogetherUserList from "./TogetherUserList.vue";
-import TogetherPlaylist from "./TogetherPlaylist.vue";
 import { useTogetherStore, useStatusStore } from "@/stores";
 
 const togetherStore = useTogetherStore();

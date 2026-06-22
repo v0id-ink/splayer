@@ -10,8 +10,7 @@ const AUD = "splayer-fcapp";
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 // Base64url 编码
-const b64url = (input: string | Buffer): string =>
-  Buffer.from(input).toString("base64url");
+const b64url = (input: string | Buffer): string => Buffer.from(input).toString("base64url");
 
 // 签发 RS256 JWT（无 kid，匹配阿里云 FC 无 kid 的 JWKS）
 const signJWT = (privateKeyPem: string): { token: string; exp: number } => {

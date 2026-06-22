@@ -5,10 +5,7 @@ import { isElectron } from "./env";
 declare global {
   interface Window {
     turnstile?: {
-      render: (
-        container: string | HTMLElement,
-        options: TurnstileOptions,
-      ) => string | undefined;
+      render: (container: string | HTMLElement, options: TurnstileOptions) => string | undefined;
       reset: (widgetId: string) => void;
       remove: (widgetId: string) => void;
       getResponse: (widgetId: string) => string | undefined;

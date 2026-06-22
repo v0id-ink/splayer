@@ -10,14 +10,16 @@
     <n-drawer-content :native-scrollbar="false" closable>
       <template #header>
         <div class="playlist-header">
-          <n-text class="name">播放队列</n-text>
-          <n-text class="count" depth="3"> {{ dataStore.playList.length }} 首歌曲 </n-text>
+          <n-text class="name">
+            {{ isGuestMode ? "一起听歌单" : "播放队列" }}
+          </n-text>
+          <n-text class="count" depth="3"> {{ playListData.length }} 首歌曲 </n-text>
         </div>
       </template>
       <Transition name="fade" mode="out-in">
         <!-- 播放列表 -->
         <VirtualScroll
-          v-if="dataStore.playList.length"
+          v-if="playListData.length"
           ref="playListRef"
           :item-height="80"
           :item-fixed="true"
@@ -52,13 +54,18 @@
                 ]"
                 v-debounce="
                   () => {
-                    player.togglePlayIndex(index, true);
+                    if (isGuestMode) {
+                      sendPlayCommand('GOTO', Number(songData.id));
+                    } else {
+                      player.togglePlayIndex(index, true);
+                    }
                     statusStore.playListShow = false;
                   }
                 "
               >
                 <!-- 拖拽手柄 -->
                 <div
+                  v-if="!isGuestMode"
                   class="drag-handle"
                   @mousedown="handlePointerDown($event, index, songData.name || '未知曲目')"
                   @touchstart.passive="
@@ -120,7 +127,14 @@
       <template #footer>
         <n-grid :cols="2" x-gap="16" class="playlist-menu">
           <n-gi>
-            <n-button :focusable="false" size="large" strong secondary @click="cleanPlayList">
+            <n-button
+              :focusable="false"
+              size="large"
+              strong
+              secondary
+              :disabled="isGuestMode"
+              @click="cleanPlayList"
+            >
               <template #icon>
                 <SvgIcon name="DeleteSweep" />
               </template>
@@ -168,20 +182,26 @@
 <script setup lang="ts">
 import VirtualScroll from "@/components/UI/VirtualScroll.vue";
 import { usePlayerController } from "@/core/player/PlayerController";
-import { useDataStore, useSettingStore, useStatusStore } from "@/stores";
+import { useDataStore, useSettingStore, useStatusStore, useTogetherStore } from "@/stores";
 import { removeBrackets } from "@/utils/format";
 import { useDragSort } from "@/composables/List/useDragSort";
+import { sendPlayCommand } from "@/composables/useTogether";
 
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const togetherStore = useTogetherStore();
 const player = usePlayerController();
 
 const playListRef = ref<InstanceType<typeof VirtualScroll> | null>(null);
 
+// 客人模式：一起听且非房主
+const isGuestMode = computed(() => togetherStore.inRoom && !togetherStore.isHost);
+
 // 播放列表数据
 const playListData = computed(() => {
-  return dataStore.playList.map((item) => {
+  const list = isGuestMode.value ? togetherStore.roomPlaylist : dataStore.playList;
+  return list.map((item) => {
     return {
       ...item,
       key: item.id,
