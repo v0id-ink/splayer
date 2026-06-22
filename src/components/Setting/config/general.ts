@@ -341,10 +341,6 @@ export const useGeneralSettings = (): SettingConfig => {
         ],
       },
       {
-        title: "其他设置",
-        items: [],
-      },
-      {
         title: "备份与恢复",
         tags: [{ text: "Beta", type: "warning" }],
         show: isElectron,
