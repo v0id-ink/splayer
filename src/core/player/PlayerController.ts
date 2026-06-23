@@ -8,7 +8,7 @@ import { calculateLyricIndex } from "@/utils/calc";
 import { getCoverColor } from "@/utils/color";
 import { isElectron, isMac } from "@/utils/env";
 import { isLogin } from "@/utils/auth";
-import { scrobble, scrobbleOld } from "@/api/user";
+import { scrobbleV2, scrobbleV1, scrobbleOld } from "@/api/user";
 import { getPlayerInfoObj, getPlaySongData } from "@/utils/format";
 import { handleSongQuality, shuffleArray, sleep } from "@/utils/helper";
 import lastfmScrobbler from "@/utils/lastfmScrobbler";
@@ -1480,13 +1480,18 @@ class PlayerController {
     const time = total > 0 ? Math.min(playedSeconds, total) : playedSeconds;
     // 根据接口版本分流调用
     if (settingStore.scrobbleVersion === "old") {
-      // 旧版接口仅需 id、sourceid、time
+      // 旧版接口需 id、sourceid、time
       scrobbleOld(song.id, sourceId, time).catch((err) => {
         console.warn("听歌打卡失败", err);
       });
+    } else if (settingStore.scrobbleVersion === "v1") {
+      // V1 接口上报 id 和 time
+      scrobbleV1(song.id, time).catch((err) => {
+        console.warn("听歌打卡失败", err);
+      });
     } else {
-      // 新版接口仅上报 id 和 time
-      scrobble(song.id, time).catch((err) => {
+      // V2 接口上报 id 和 time（默认）
+      scrobbleV2(song.id, time).catch((err) => {
         console.warn("听歌打卡失败", err);
       });
     }

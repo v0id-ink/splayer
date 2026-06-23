@@ -115,8 +115,20 @@ export const userLike = (uid: number) => {
   });
 };
 
-// 听歌打卡 V2 (NCBL 加密版)
-export const scrobble = (id: number, time: number) => {
+// 听歌打卡 V2 (NCBL Dawn 加密版，字段最完整)
+export const scrobbleV2 = (id: number, time: number) => {
+  return request({
+    url: "/scrobble/v2",
+    params: {
+      id,
+      time,
+      timestamp: Date.now(),
+    },
+  });
+};
+
+// 听歌打卡 V1 (NCBL 加密版)
+export const scrobbleV1 = (id: number, time: number) => {
   return request({
     url: "/scrobble/v1",
     params: {
@@ -127,7 +139,7 @@ export const scrobble = (id: number, time: number) => {
   });
 };
 
-// 听歌打卡 V1 (旧版)
+// 听歌打卡旧版 (eapi 加密)
 export const scrobbleOld = (id: number, sourceid: number, time?: number) => {
   return request({
     url: "/scrobble",

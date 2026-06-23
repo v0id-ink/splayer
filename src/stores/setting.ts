@@ -295,7 +295,7 @@ export interface SettingState {
   /** 是否打卡歌曲 */
   scrobbleSong: boolean;
   /** 听歌打卡接口版本 */
-  scrobbleVersion: "new" | "old";
+  scrobbleVersion: "v2" | "v1" | "old";
   /** 动态封面 */
   dynamicCover: boolean;
   /** 是否使用 keep-alive */
@@ -550,7 +550,7 @@ export const useSettingStore = defineStore("setting", {
     smtcOpen: true,
     playSongDemo: false,
     scrobbleSong: false,
-    scrobbleVersion: "new",
+    scrobbleVersion: "v2",
     dynamicCover: false,
     lyricFontSizeMode: "adaptive",
     lyricFontSize: 46,
