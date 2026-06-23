@@ -172,15 +172,15 @@ const toSearch = async (key: any, type: string = "keyword") => {
   }
   // 更新推荐
   updatePlaceholder();
-  // 仅 Web 端：输入为单个链接时尝试解析短链
+  // 仅 Web 端：回车搜索网易云链接时解析短链并跳转百科
   if (type === "keyword" && !isElectron && typeof key === "string") {
     const trimmed = key.trim();
-    // 判断整行是否为一个链接
-    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+    // 仅匹配 163cn.tv 和 music.163.com 域名的链接
+    const urlRegex = /^https?:\/\/(?:163cn\.tv|music\.163\.com)\/[^\s]*$/;
     if (urlRegex.test(trimmed)) {
       try {
         const res = await shortlinkResolve(trimmed);
-        const id = res?.data?.id;
+        const id = res?.id;
         if (id) {
           router.push({ name: "song-wiki", query: { id } });
           return;
