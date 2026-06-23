@@ -52,10 +52,11 @@
 
 <script setup lang="ts">
 import { useStatusStore, useDataStore, useSettingStore } from "@/stores";
-import { searchDefault } from "@/api/search";
+import { searchDefault, shortlinkResolve } from "@/api/search";
 import { usePlayerController } from "@/core/player/PlayerController";
 import { songDetail } from "@/api/song";
 import { formatSongsList } from "@/utils/format";
+import { isElectron } from "@/utils/env";
 import SearchInpMenu from "@/components/Menu/SearchInpMenu.vue";
 import AudioMatch from "@/components/Modal/AudioMatch.vue";
 
@@ -171,6 +172,24 @@ const toSearch = async (key: any, type: string = "keyword") => {
   }
   // 更新推荐
   updatePlaceholder();
+  // 仅 Web 端：输入为单个链接时尝试解析短链
+  if (type === "keyword" && !isElectron && typeof key === "string") {
+    const trimmed = key.trim();
+    // 判断整行是否为一个链接
+    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+    if (urlRegex.test(trimmed)) {
+      try {
+        const res = await shortlinkResolve(trimmed);
+        const id = res?.data?.id;
+        if (id) {
+          router.push({ name: "song-wiki", query: { id } });
+          return;
+        }
+      } catch {
+        // 解析失败无反应
+      }
+    }
+  }
   // 前往搜索
   switch (type) {
     case "keyword":

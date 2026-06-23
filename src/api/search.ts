@@ -70,3 +70,11 @@ export const searchResult = (
     },
   });
 };
+
+// 解析短链接
+export const shortlinkResolve = (url: string) => {
+  return request({
+    url: "/shortlink/resolve",
+    params: { url },
+  });
+};
