@@ -182,6 +182,7 @@ const toSearch = async (key: any, type: string = "keyword") => {
         const res = await shortlinkResolve(trimmed);
         const id = res?.id;
         if (id) {
+          statusStore.searchInputValue = "";
           router.push({ name: "song-wiki", query: { id } });
           return;
         }
