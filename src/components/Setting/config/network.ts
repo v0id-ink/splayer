@@ -563,7 +563,7 @@ export const useNetworkSettings = (): SettingConfig => {
                 key: "scrobbleVersion",
                 label: "网易云音乐听歌打卡接口版本",
                 type: "select",
-                description: "V2 为 NCBL Dawn 加密（字段最完整），V1 为 NCBL 加密，旧版为 eapi 请求",
+                description: "优先推荐v2，v1服务端会无视，old有封号风险。",
                 options: [
                   { label: "V2 (推荐)", value: "v2" },
                   { label: "V1", value: "v1" },
