@@ -124,12 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useMusicStore,
-  useStatusStore,
-  useSettingStore,
-  useDataStore,
-} from "@/stores";
+import { useMusicStore, useStatusStore, useSettingStore, useDataStore } from "@/stores";
 import { useBlobURLManager } from "@/core/resource/BlobURLManager";
 import { isElectron } from "@/utils/env";
 import { useMobile } from "@/composables/useMobile";

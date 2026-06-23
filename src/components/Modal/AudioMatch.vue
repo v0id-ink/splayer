@@ -58,7 +58,7 @@ import { audioMatch } from "@/api/audioMatch";
 import { songDetail } from "@/api/song";
 import { usePlayerController } from "@/core/player/PlayerController";
 import { formatSongsList, removeBrackets } from "@/utils/format";
-import type { SongType } from "@/types";
+import type { SongType } from "@/types/main";
 
 /** 最大录制时长（秒） */
 const MAX_DURATION = 15;
@@ -159,7 +159,6 @@ async function initAudio() {
       echoCancellation: false,
       autoGainControl: false,
       noiseSuppression: false,
-      latency: 0,
     },
   });
   const micSource = audioCtx.createMediaStreamSource(micStream);

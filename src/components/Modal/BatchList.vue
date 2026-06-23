@@ -116,6 +116,7 @@ import { deleteSongs } from "@/utils/auth";
 import { NInput, NInputNumber, NButton, NText, NFlex } from "naive-ui";
 import { useLocalStore, useStatusStore } from "@/stores";
 import { openDownloadSongs } from "@/utils/modal";
+import { isElectron } from "@/utils/env";
 
 const localStore = useLocalStore();
 const statusStore = useStatusStore();

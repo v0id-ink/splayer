@@ -294,6 +294,8 @@ export interface SettingState {
   realIP: string;
   /** 是否打卡歌曲 */
   scrobbleSong: boolean;
+  /** 听歌打卡接口版本 */
+  scrobbleVersion: "new" | "old";
   /** 动态封面 */
   dynamicCover: boolean;
   /** 是否使用 keep-alive */

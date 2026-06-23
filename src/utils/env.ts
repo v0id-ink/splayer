@@ -22,8 +22,7 @@ export const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Oper
 export const isDevBuild = import.meta.env.VITE_BUILD_TYPE === "dev";
 
 /** 是否启用一起听功能 */
-export const enableListenTogether =
-  import.meta.env.VITE_ENABLE_LISTEN_TOGETHER === "true";
+export const enableListenTogether = import.meta.env.VITE_ENABLE_LISTEN_TOGETHER === "true";
 
 /**
  * 检查环境是否隔离

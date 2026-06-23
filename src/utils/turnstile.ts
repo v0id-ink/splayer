@@ -15,7 +15,7 @@ declare global {
 }
 
 interface TurnstileOptions {
-  sitekey: string;
+  sitekey?: string;
   appearance?: "always" | "execute" | "interaction-only";
   execution?: "render" | "execute";
   callback?: (token: string) => void;
@@ -24,7 +24,7 @@ interface TurnstileOptions {
   "timeout-callback"?: () => void;
 }
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 const CONTAINER_ID = "turnstile-invisible";
 // Turnstile token 有效期 5 分钟，提前 1 分钟刷新
 const TOKEN_TTL = 4 * 60 * 1000;
