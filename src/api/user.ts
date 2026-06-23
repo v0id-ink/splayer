@@ -116,26 +116,13 @@ export const userLike = (uid: number) => {
 };
 
 // 听歌打卡 V2 (NCBL 加密版)
-export const scrobble = (
-  id: number,
-  time: number,
-  options?: {
-    sourceid?: number;
-    source?: string;
-    name?: string;
-    artist?: string;
-    bitrate?: number;
-    level?: string;
-    total?: number;
-  },
-) => {
+export const scrobble = (id: number, time: number) => {
   return request({
     url: "/scrobble/v1",
     params: {
       id,
       time,
       timestamp: Date.now(),
-      ...options,
     },
   });
 };

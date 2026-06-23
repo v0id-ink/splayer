@@ -1478,7 +1478,6 @@ class PlayerController {
     const total = song.duration > 0 ? Math.floor(song.duration / 1000) : 0;
     // 听歌时长超过歌曲总时长时截断
     const time = total > 0 ? Math.min(playedSeconds, total) : playedSeconds;
-    const info = getPlayerInfoObj(song);
     // 根据接口版本分流调用
     if (settingStore.scrobbleVersion === "old") {
       // 旧版接口仅需 id、sourceid、time
@@ -1486,13 +1485,8 @@ class PlayerController {
         console.warn("听歌打卡失败", err);
       });
     } else {
-      scrobble(song.id, time, {
-        sourceid: sourceId,
-        name: info?.name,
-        artist: info?.artist,
-        level: settingStore.songLevel,
-        total,
-      }).catch((err) => {
+      // 新版接口仅上报 id 和 time
+      scrobble(song.id, time).catch((err) => {
         console.warn("听歌打卡失败", err);
       });
     }
