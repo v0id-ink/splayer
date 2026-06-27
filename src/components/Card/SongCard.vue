@@ -162,7 +162,7 @@
       </div>
       <!-- 操作 -->
       <div
-        v-if="song.type !== 'radio' && settingStore.showSongOperations"
+        v-if="song.type !== 'radio' && song.type !== 'pigeon' && settingStore.showSongOperations"
         class="actions"
         @click.stop
         @dblclick.stop

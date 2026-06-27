@@ -344,7 +344,7 @@ export const toLikeSong: DebouncedFunc<(song: SongType, like: boolean) => Promis
       }
       const dataStore = useDataStore();
       const { id, path, type } = song;
-      if (path || type === "streaming") {
+      if (path || type === "streaming" || type === "pigeon") {
         window.$message.warning("该类型歌曲暂未实现");
         return;
       }

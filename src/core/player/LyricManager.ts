@@ -834,6 +834,10 @@ class LyricManager {
     };
 
     try {
+      // PigeonCDN 歌曲无歌词
+      if (song?.type === "pigeon") {
+        return fetchResult;
+      }
       // 判断歌词来源
       const isLocal = Boolean(song.path) || false;
       if (isStreaming) {

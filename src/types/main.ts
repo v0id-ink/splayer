@@ -45,7 +45,14 @@ export enum QualityType {
 }
 
 /** 音频源类型 */
-export type AudioSourceType = "official" | "netease" | "kuwo" | "bodian" | "local" | "streaming";
+export type AudioSourceType =
+  | "official"
+  | "netease"
+  | "kuwo"
+  | "bodian"
+  | "local"
+  | "streaming"
+  | "pigeon";
 
 export type UserType = {
   id: number;
@@ -105,9 +112,9 @@ export type SongType = {
   playCount?: number;
   /**
    * 歌曲类型
-   * song: 歌曲 | radio: 电台 | streaming: 流媒体
+   * song: 歌曲 | radio: 电台 | streaming: 流媒体 | pigeon: PigeonCDN
    */
-  type: "song" | "radio" | "streaming";
+  type: "song" | "radio" | "streaming" | "pigeon";
   /** 流媒体播放 URL */
   streamUrl?: string;
   /** 原始 ID（流媒体服务器的 ID） */

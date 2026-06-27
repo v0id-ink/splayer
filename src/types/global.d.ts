@@ -1,6 +1,9 @@
 import { DialogApi, LoadingBarApi, MessageApi, ModalApi, NotificationApi } from "naive-ui";
 
 declare global {
+  /** 编译时特性标志：是否启用 PigeonCDN */
+  const FEATURE_ENABLE_PIGEON_CDN: boolean;
+
   interface Window {
     // naiveui
     $message: MessageApi;

@@ -84,6 +84,9 @@ export default defineConfig(({ mode }) => {
         wasm(),
       ],
       resolve: commonResolve,
+      define: {
+        FEATURE_ENABLE_PIGEON_CDN: JSON.stringify(true),
+      },
       css: {
         preprocessorOptions: {
           scss: {

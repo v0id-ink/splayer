@@ -464,6 +464,8 @@ export interface SettingState {
   playerFullscreenGradient: number;
   /** 是否启用流媒体功能 */
   streamingEnabled: boolean;
+  /** 是否启用 PigeonCDN 来源 */
+  usePigeonCDN: boolean;
   /** Fuck AI: 开启后在所有的地方都不显示 Hi-res 以上的音质选项 */
   disableAiAudio: boolean;
   /** Fuck DJ: 开启后自动跳过 DJ 歌曲 */
@@ -741,6 +743,7 @@ export const useSettingStore = defineStore("setting", {
     playerStyleRatio: 50,
     playerFullscreenGradient: 15,
     streamingEnabled: false,
+    usePigeonCDN: true,
     disableAiAudio: false,
     disableDjMode: false,
     enableAutomix: false,

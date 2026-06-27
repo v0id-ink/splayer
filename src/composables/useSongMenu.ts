@@ -204,7 +204,10 @@ export const useSongMenu = () => {
       {
         key: "playlist-add",
         label: "添加到歌单",
-        show: settingStore.contextMenuOptions.addToPlaylist && type !== "streaming",
+        show:
+          settingStore.contextMenuOptions.addToPlaylist &&
+          type !== "streaming" &&
+          type !== "pigeon",
         props: {
           onClick: () => openPlaylistAdd([song], isLocal),
         },
@@ -222,7 +225,7 @@ export const useSongMenu = () => {
       {
         key: "comment",
         label: "查看评论",
-        show: !isLocal && type !== "streaming",
+        show: !isLocal && type !== "streaming" && type !== "pigeon",
         props: {
           onClick: () => {
             const commentType = type === "radio" ? 4 : 0;
@@ -257,7 +260,7 @@ export const useSongMenu = () => {
         children: [
           {
             key: "code-name",
-            label: `复制${type === "song" ? "歌曲" : type === "streaming" ? "流媒体" : "节目"}名称`,
+            label: `复制${type === "song" ? "歌曲" : type === "streaming" ? "流媒体" : type === "pigeon" ? "PigeonCDN" : "节目"}名称`,
             show: settingStore.contextMenuOptions.copyName,
             props: {
               onClick: () => copyData(song.name),
@@ -266,7 +269,7 @@ export const useSongMenu = () => {
           },
           {
             key: "code-id",
-            label: `复制${type === "song" ? "歌曲" : type === "streaming" ? "流媒体" : "节目"} ID`,
+            label: `复制${type === "song" ? "歌曲" : type === "streaming" ? "流媒体" : type === "pigeon" ? "PigeonCDN" : "节目"} ID`,
             show: !isLocal,
             props: {
               onClick: () => copyData(song.id),
@@ -284,8 +287,8 @@ export const useSongMenu = () => {
           },
           {
             key: "share",
-            label: `分享${type === "song" ? "歌曲" : "节目"}链接`,
-            show: !isLocal && type !== "streaming",
+            label: `分享${type === "song" ? "歌曲" : type === "pigeon" ? "PigeonCDN" : "节目"}链接`,
+            show: !isLocal && type !== "streaming" && type !== "pigeon",
             props: {
               onClick: () => copyData(getShareUrl(type, song.id), "已复制分享链接到剪贴板"),
             },

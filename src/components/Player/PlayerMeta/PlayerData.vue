@@ -226,12 +226,14 @@ const sourceMap: Record<string, string> = {
   [SongUnlockServer.BODIAN]: "Bodian",
   local: "Local",
   streaming: "Streaming",
+  pigeon: "PigeonCDN",
 };
 
 /** 音频源名称 */
 const audioSourceText = computed(() => {
   if (musicStore.playSong.path) return "本地";
   if (musicStore.playSong.type === "streaming") return "流媒体";
+  if (musicStore.playSong.type === "pigeon") return "PigeonCDN";
   if (musicStore.playSong.pc) return "云盘";
   if (statusStore.audioSource) {
     return sourceMap[statusStore.audioSource] || statusStore.audioSource.toUpperCase();

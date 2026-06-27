@@ -10,7 +10,9 @@
           <!-- 喜欢歌曲 -->
           <div
             v-if="
-              musicStore.playSong.type !== 'radio' && settingStore.fullscreenPlayerElements.like
+              musicStore.playSong.type !== 'radio' &&
+              musicStore.playSong.type !== 'pigeon' &&
+              settingStore.fullscreenPlayerElements.like
             "
             class="menu-icon"
             @click="toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong.id))"

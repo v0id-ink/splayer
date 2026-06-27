@@ -53,6 +53,11 @@ const appRoutes: Array<RouteRecordRaw> = [
         name: "search-radios",
         component: () => import("@/views/Search/radios.vue"),
       },
+      {
+        path: "pigeon",
+        name: "search-pigeon",
+        component: () => import("@/views/Search/pigeon.vue"),
+      },
     ],
   },
   // 发现

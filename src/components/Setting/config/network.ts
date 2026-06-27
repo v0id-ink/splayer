@@ -212,6 +212,22 @@ export const useNetworkSettings = (): SettingConfig => {
     onActivate,
     groups: [
       {
+        title: "PigeonCDN",
+        show: FEATURE_ENABLE_PIGEON_CDN,
+        items: [
+          {
+            key: "usePigeonCDN",
+            label: "启用 PigeonCDN",
+            type: "switch",
+            description: "开启后可在搜索中使用 PigeonCDN 来源（节奏游戏音乐）",
+            value: computed({
+              get: () => settingStore.usePigeonCDN,
+              set: (v) => (settingStore.usePigeonCDN = v),
+            }),
+          },
+        ],
+      },
+      {
         title: "流媒体服务",
         items: [
           {

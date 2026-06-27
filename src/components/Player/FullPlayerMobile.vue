@@ -31,7 +31,7 @@
             <div class="info-actions">
               <!-- 喜欢 -->
               <div
-                v-if="musicStore.playSong.type !== 'radio'"
+                v-if="musicStore.playSong.type !== 'radio' && musicStore.playSong.type !== 'pigeon'"
                 class="action-btn"
                 @click="
                   toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong.id))

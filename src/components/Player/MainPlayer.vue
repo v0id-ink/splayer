@@ -67,7 +67,7 @@
             </n-tag>
             <!-- 喜欢 -->
             <SvgIcon
-              v-if="musicStore.playSong.type !== 'radio'"
+              v-if="musicStore.playSong.type !== 'radio' && musicStore.playSong.type !== 'pigeon'"
               :name="dataStore.isLikeSong(musicStore.playSong.id) ? 'Favorite' : 'FavoriteBorder'"
               :size="20"
               class="like"

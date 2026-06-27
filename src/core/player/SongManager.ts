@@ -425,6 +425,18 @@ class SongManager {
         return this.nextPrefetch;
       }
 
+      // PigeonCDN 歌曲
+      if (nextSong.type === "pigeon" && nextSong.streamUrl) {
+        this.nextPrefetch = {
+          id: nextSong.id,
+          url: nextSong.streamUrl,
+          isUnlocked: false,
+          quality: QualityType.SQ,
+          source: "pigeon",
+        };
+        return this.nextPrefetch;
+      }
+
       // 在线歌曲：优先官方，其次解灰
       const songId = nextSong.type === "radio" ? nextSong.dj?.id : nextSong.id;
       if (!songId) return;
@@ -507,6 +519,18 @@ class SongManager {
         isUnlocked: false,
         quality: song.quality || QualityType.SQ,
         source: "streaming",
+      };
+    }
+
+    // PigeonCDN 歌曲
+    if (song.type === "pigeon" && song.streamUrl) {
+      console.log(`🎵 [${song.id}] PigeonCDN URL:`, song.streamUrl);
+      return {
+        id: song.id,
+        url: song.streamUrl,
+        isUnlocked: false,
+        quality: QualityType.SQ,
+        source: "pigeon",
       };
     }
 
