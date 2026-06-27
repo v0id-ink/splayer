@@ -16,6 +16,7 @@
     >
       <template #action-buttons>
         <n-button
+          v-if="!isPigeonAlbum"
           :focusable="false"
           strong
           secondary
@@ -53,6 +54,7 @@
     </template>
     <!-- 评论 -->
     <ListComment
+      v-if="!isPigeonAlbum"
       v-show="currentTab === 'comments'"
       :id="albumId"
       :type="3"
@@ -70,6 +72,7 @@ import { renderIcon, copyData, getShareUrl } from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
 import { useDataStore } from "@/stores";
 import { toLikeAlbum } from "@/utils/auth";
+import { getPigeonAlbumDetail, isPigeonAlbumId } from "@/api/pigeon";
 import { useListDetail } from "@/composables/List/useListDetail";
 import { useListSearch } from "@/composables/List/useListSearch";
 import { useListScroll } from "@/composables/List/useListScroll";
@@ -103,6 +106,9 @@ const { playAllSongs: playAllSongsAction } = useListActions();
 // 专辑 ID
 const oldAlbumId = ref<number>(0);
 const albumId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
+
+// 是否为 PigeonCDN 专辑
+const isPigeonAlbum = computed(() => isPigeonAlbumId(albumId.value));
 
 // 当前正在请求的专辑 ID，用于防止竞态条件
 const currentRequestId = ref<number>(0);
@@ -170,6 +176,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
   {
     label: "打开源页面",
     key: "open",
+    show: !isPigeonAlbum.value,
     props: {
       onClick: () => {
         window.open(`https://music.163.com/#/album?id=${albumId.value}`);
@@ -182,6 +189,25 @@ const moreOptions = computed<DropdownOption[]>(() => [
 // 获取专辑基础信息
 const getAlbumDetail = async (id: number, refresh: boolean = false) => {
   if (!id) return;
+  // PigeonCDN 专辑
+  if (isPigeonAlbumId(id)) {
+    currentRequestId.value = id;
+    setLoading(true);
+    clearSearch();
+    try {
+      const result = await getPigeonAlbumDetail(id);
+      if (currentRequestId.value !== id) return;
+      if (!result) throw new Error("PigeonCDN album not found");
+      setDetailData(result.detail);
+      setListData(result.songs);
+    } catch (error) {
+      console.error("PigeonCDN album load failed", error);
+      window.$message.error("加载专辑失败");
+    } finally {
+      setLoading(false);
+    }
+    return;
+  }
   // 设置当前请求的专辑 ID，用于防止竞态条件
   currentRequestId.value = id;
   setLoading(true);

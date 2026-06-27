@@ -3,7 +3,7 @@
  * 提供节奏游戏音乐（Phigros、Rizline）的搜索与播放
  */
 
-import type { SongType } from "@/types/main";
+import type { SongType, CoverType } from "@/types/main";
 
 /** CDN 基础地址 */
 const PIGEON_CDN_BASE = "https://pigeon-cdn.c0ffee.space";
@@ -69,6 +69,25 @@ const toPigeonOriginalId = (audio: string): string => {
 };
 
 /**
+ * 将游戏名哈希为专辑数字 ID
+ * PigeonCDN 专辑 ID 以 1004 开头
+ */
+const hashGameName = (game: string): number => {
+  let hash = 0;
+  for (let i = 0; i < game.length; i++) {
+    const char = game.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Number(`1004${Math.abs(hash)}`);
+};
+
+/** 判断是否为 PigeonCDN 专辑 ID */
+export const isPigeonAlbumId = (id: number | string): boolean => {
+  return String(id).startsWith("1004");
+};
+
+/**
  * 拉取 PigeonCDN 索引
  * 带内存缓存，过期后自动刷新
  */
@@ -95,7 +114,7 @@ export const formatPigeonSong = (song: PigeonSong): SongType => ({
   originalId: toPigeonOriginalId(song.audio),
   name: song.name,
   artists: [{ id: 0, name: song.composer }],
-  album: song.game,
+  album: { id: hashGameName(song.game), name: song.game },
   cover: `${PIGEON_CDN_BASE}/${song.illustration}`,
   duration: 0,
   type: "pigeon",
@@ -139,4 +158,30 @@ export const getPigeonSongByOriginalId = async (
   const index = await fetchPigeonIndex();
   const matched = index.songs.find((song) => String(hashAudioPath(song.audio)) === hash);
   return matched ? formatPigeonSong(matched) : null;
+};
+
+/**
+ * 根据专辑 ID 获取 PigeonCDN 专辑详情和歌曲列表
+ */
+export const getPigeonAlbumDetail = async (
+  albumId: number,
+): Promise<{ detail: CoverType; songs: SongType[] } | null> => {
+  const index = await fetchPigeonIndex();
+  // 反查游戏名
+  const gameEntry = Object.entries(index.games).find(
+    ([game]) => hashGameName(game) === albumId,
+  );
+  if (!gameEntry) return null;
+  const [gameName, gameInfo] = gameEntry;
+  const gameSongs = index.songs.filter((song) => song.game === gameName);
+  const songs = gameSongs.map(formatPigeonSong);
+  const detail: CoverType = {
+    id: albumId,
+    name: gameName,
+    cover:
+      gameSongs.length > 0 ? `${PIGEON_CDN_BASE}/${gameSongs[0].illustration}` : "",
+    description: `PigeonCDN · ${gameName} v${gameInfo.version}`,
+    count: songs.length,
+  };
+  return { detail, songs };
 };
