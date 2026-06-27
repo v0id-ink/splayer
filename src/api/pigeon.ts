@@ -41,17 +41,31 @@ let cachedIndex: PigeonIndex | null = null;
 let cachedTime = 0;
 
 /**
- * 将字符串哈希为数字 ID
- * PigeonCDN ID 以 1003 开头
+ * 将音频路径哈希为数字
  */
-const stringToNumericId = (id: string): number => {
+const hashAudioPath = (audio: string): number => {
   let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    const char = id.charCodeAt(i);
+  for (let i = 0; i < audio.length; i++) {
+    const char = audio.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
-  return Number(`1003${Math.abs(hash)}`);
+  return Math.abs(hash);
+};
+
+/**
+ * 将字符串哈希为数字 ID
+ * PigeonCDN ID 以 1003 开头
+ */
+const stringToNumericId = (audio: string): number => {
+  return Number(`1003${hashAudioPath(audio)}`);
+};
+
+/**
+ * 生成 pigeon_ 前缀的原始 ID（用于分享链接）
+ */
+const toPigeonOriginalId = (audio: string): string => {
+  return `pigeon_${hashAudioPath(audio)}`;
 };
 
 /**
@@ -78,9 +92,10 @@ export const fetchPigeonIndex = async (force = false): Promise<PigeonIndex> => {
  */
 export const formatPigeonSong = (song: PigeonSong): SongType => ({
   id: stringToNumericId(song.audio),
+  originalId: toPigeonOriginalId(song.audio),
   name: song.name,
   artists: [{ id: 0, name: song.composer }],
-  album: { id: 0, name: song.game },
+  album: song.game,
   cover: `${PIGEON_CDN_BASE}/${song.illustration}`,
   duration: 0,
   type: "pigeon",
@@ -111,4 +126,17 @@ export const searchPigeonSongs = async (keyword: string): Promise<SongType[]> =>
 export const getPigeonIndexUpdatedAt = async (): Promise<string | null> => {
   const index = await fetchPigeonIndex();
   return index.updatedAt || null;
+};
+
+/**
+ * 根据 pigeon_ 前缀的原始 ID 查找歌曲
+ */
+export const getPigeonSongByOriginalId = async (
+  originalId: string,
+): Promise<SongType | null> => {
+  if (!originalId.startsWith("pigeon_")) return null;
+  const hash = originalId.slice("pigeon_".length);
+  const index = await fetchPigeonIndex();
+  const matched = index.songs.find((song) => String(hashAudioPath(song.audio)) === hash);
+  return matched ? formatPigeonSong(matched) : null;
 };

@@ -311,6 +311,7 @@ import { useSettingStore, useStatusStore } from "@/stores";
 import dayjs from "dayjs";
 import { useSongMenu } from "@/composables/useSongMenu";
 import { formatTimestamp } from "@/utils/time";
+import { getPigeonSongByOriginalId } from "@/api/pigeon";
 
 const route = useRoute();
 const player = usePlayerController();
@@ -320,7 +321,7 @@ const statusStore = useStatusStore();
 const { getMenuOptions } = useSongMenu();
 
 const loading = ref(true);
-const currentSongId = ref<number>(0);
+const currentSongId = ref<number | string>(0);
 const currentSong = ref<SongType | null>(null);
 const viewModel = ref<WikiViewModel | null>(null);
 const similarSongsList = ref<SongType[]>([]);
@@ -425,25 +426,53 @@ const normalizeWikiData = (
 };
 
 // 获取歌曲信息
-const fetchData = async (id?: number, autoPlay?: boolean) => {
-  id = id ?? Number(route.query.id);
+const fetchData = async (id?: number | string, autoPlay?: boolean) => {
+  const rawId = id ?? (route.query.id as string);
   autoPlay = autoPlay ?? route.query.play !== undefined;
-  if (!id || id === currentSongId.value) return;
+  if (!rawId || rawId === currentSongId.value) return;
+
   const token = ++currentRequestToken.value;
   loading.value = true;
-  currentSongId.value = id;
+  currentSongId.value = rawId;
   viewModel.value = null;
   similarSongsList.value = [];
   sheetLoading.value = {};
+
+  // PigeonCDN 歌曲
+  if (typeof rawId === "string" && rawId.startsWith("pigeon_")) {
+    try {
+      const song = await getPigeonSongByOriginalId(rawId);
+      if (token !== currentRequestToken.value) return;
+      if (!song) throw new Error("PigeonCDN song not found");
+      currentSong.value = song;
+    } catch (error) {
+      console.error("Fetch PigeonCDN song failed", error);
+      window.$message.error("加载信息失败");
+      currentSong.value = null;
+    } finally {
+      if (token === currentRequestToken.value) {
+        loading.value = false;
+        if (autoPlay && currentSong.value) {
+          handlePlay();
+          statusStore.showFullPlayer = true;
+        }
+      }
+    }
+    return;
+  }
+
+  // 网易云歌曲
+  const numericId = Number(rawId);
+  if (!numericId) return;
   try {
-    const detailRes = await songDetail(id);
+    const detailRes = await songDetail(numericId);
     if (!detailRes.songs?.[0]) throw new Error("Song not found");
     if (token !== currentRequestToken.value) return;
     currentSong.value = formatSongsList(detailRes.songs)[0];
     const [wikiRes, listenRes, sheetRes] = await Promise.allSettled([
-      songWikiSummary(id),
-      songFirstListenInfo(id),
-      songSheetList(id),
+      songWikiSummary(numericId),
+      songFirstListenInfo(numericId),
+      songSheetList(numericId),
     ]);
     if (token !== currentRequestToken.value) return;
     // 获取歌曲信息
@@ -509,7 +538,7 @@ onActivated(() => fetchData());
 
 // 监听路由更新
 onBeforeRouteUpdate((to) => {
-  fetchData(Number(to.query.id), to.query.play !== undefined);
+  fetchData(to.query.id as string, to.query.play !== undefined);
 });
 </script>
 

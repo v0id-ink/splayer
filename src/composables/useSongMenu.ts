@@ -288,9 +288,13 @@ export const useSongMenu = () => {
           {
             key: "share",
             label: `分享${type === "song" ? "歌曲" : type === "pigeon" ? "PigeonCDN" : "节目"}链接`,
-            show: !isLocal && type !== "streaming" && type !== "pigeon",
+            show: !isLocal && type !== "streaming",
             props: {
-              onClick: () => copyData(getShareUrl(type, song.id), "已复制分享链接到剪贴板"),
+              onClick: () =>
+                copyData(
+                  getShareUrl(type, type === "pigeon" ? song.originalId ?? "" : song.id),
+                  "已复制分享链接到剪贴板",
+                ),
             },
             icon: renderIcon("Share", { size: 18 }),
           },

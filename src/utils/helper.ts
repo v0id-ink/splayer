@@ -483,6 +483,10 @@ export const handleSongQuality = (
  * @returns 分享链接
  */
 export const getShareUrl = (type: string, id: number | string): string => {
+  // PigeonCDN 始终使用站内分享
+  if (type === "pigeon") {
+    return `${window.location.origin}${window.location.pathname}#/song/wiki?id=${id}&src=share&play`;
+  }
   // Web 端使用 SPlayer 分享链接
   if (!isElectron) {
     // 歌曲使用百科页并自动播放
